@@ -1,0 +1,25 @@
+; Time 0.120981
+; ParsingTime 0
+; NrActions 
+; MakeSpan 
+; MetricValue 18
+0 : (recon andromeda) [1]
+1 : (break-into andromeda) [1]
+2 : (clean andromeda) [1]
+3 : (gain-root andromeda) [1]
+4 : (download-files andromeda) [1]
+5 : (steal-data andromeda) [1]
+6 : (recon aries) [1]
+7 : (break-into aries) [1]
+8 : (clean aries) [1]
+9 : (gain-root aries) [1]
+10 : (download-files aries) [1]
+11 : (steal-data aries) [1]
+12 : (recon taurus) [1]
+13 : (break-into taurus) [1]
+14 : (clean taurus) [1]
+15 : (gain-root taurus) [1]
+16 : (download-files taurus) [1]
+17 : (steal-data taurus) [1]
+;; stats: intrusion-detection::intrusion-detection-10-hosts 1 1 9 18 606 0.120981 0 0 0 604 0.085987
+;; (:heuristic ((data-stolen-from taurus)(data-stolen-from aries)(data-stolen-from andromeda)) 17)

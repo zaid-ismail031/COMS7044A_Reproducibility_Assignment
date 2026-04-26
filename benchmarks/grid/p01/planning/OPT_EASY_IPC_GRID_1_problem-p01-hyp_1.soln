@@ -1,0 +1,16 @@
+; Time 0.074988
+; ParsingTime 0.000999
+; NrActions 
+; MakeSpan 
+; MetricValue 9
+0 : (pickup node_c key0) [1]
+1 : (unlock node_c node_d key0 triangle) [1]
+2 : (move node_c node_d) [1]
+3 : (move node_d node_e) [1]
+4 : (pickup node_e key3) [1]
+5 : (move node_e node_d) [1]
+6 : (move node_d node_c) [1]
+7 : (unlock node_c node_g key3 star) [1]
+8 : (move node_c node_g) [1]
+;; stats: grid::strips-grid-1 1 1 9 9 9 0.073989 0 0 0 0 0.001
+;; (:heuristic ((at-robot node_g)) 0)

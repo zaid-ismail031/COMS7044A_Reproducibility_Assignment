@@ -1,0 +1,5 @@
+(take cloth)
+(take tea_bag)
+(take milk)
+(take bread)
+(use toaster)

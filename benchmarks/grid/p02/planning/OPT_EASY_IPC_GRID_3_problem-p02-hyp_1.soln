@@ -1,0 +1,29 @@
+; Time 0.181972
+; ParsingTime 0.000999
+; NrActions 
+; MakeSpan 
+; MetricValue 22
+0 : (move node_a node_c) [1]
+1 : (pickup node_c key0) [1]
+2 : (move node_c node_d) [1]
+3 : (unlock node_d node_e key0 triangle) [1]
+4 : (move node_d node_e) [1]
+5 : (move node_e node_f) [1]
+6 : (pickup node_f key2) [1]
+7 : (move node_f node_e) [1]
+8 : (move node_e node_d) [1]
+9 : (move node_d node_g) [1]
+10 : (unlock node_g node_h key2 star) [1]
+11 : (move node_g node_h) [1]
+12 : (move node_h node_i) [1]
+13 : (pickup node_i key1) [1]
+14 : (move node_i node_h) [1]
+15 : (move node_h node_g) [1]
+16 : (move node_g node_d) [1]
+17 : (move node_d node_e) [1]
+18 : (move node_e node_f) [1]
+19 : (move node_f node_j) [1]
+20 : (unlock node_j node_k key1 circle) [1]
+21 : (move node_j node_k) [1]
+;; stats: grid::strips-grid-2 1 1 19 22 27 0.179973 0 0 0 11 0.003
+;; (:heuristic ((at-robot node_k)) 21)

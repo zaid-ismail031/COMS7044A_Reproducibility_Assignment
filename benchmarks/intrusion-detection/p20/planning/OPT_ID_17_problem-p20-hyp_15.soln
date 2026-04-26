@@ -1,0 +1,24 @@
+; Time 0.082987
+; ParsingTime 0
+; NrActions 
+; MakeSpan 
+; MetricValue 17
+0 : (recon cassiopea) [1]
+1 : (break-into cassiopea) [1]
+2 : (modify-files cassiopea) [1]
+3 : (clean cassiopea) [1]
+4 : (vandalize cassiopea) [1]
+5 : (recon scorpio) [1]
+6 : (break-into scorpio) [1]
+7 : (clean scorpio) [1]
+8 : (gain-root scorpio) [1]
+9 : (download-files scorpio) [1]
+10 : (steal-data scorpio) [1]
+11 : (recon aries) [1]
+12 : (break-into aries) [1]
+13 : (clean aries) [1]
+14 : (gain-root aries) [1]
+15 : (download-files aries) [1]
+16 : (steal-data aries) [1]
+;; stats: intrusion-detection::intrusion-detection-10-hosts 1 1 9 17 444 0.082987 0 0 0 442 0.051992
+;; (:heuristic ((vandalized cassiopea)(data-stolen-from aries)(data-stolen-from scorpio)) 16)
