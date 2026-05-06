@@ -12,6 +12,8 @@ DEFAULT_SEARCH = "astar(lmcut())"
 
 
 def plan(domain_path, problem_path, search=DEFAULT_SEARCH, timeout=300):
+    domain_path = Path(domain_path).resolve()
+    problem_path = Path(problem_path).resolve()
     with tempfile.TemporaryDirectory() as workdir:
         result = subprocess.run(
             [FD_BIN, str(domain_path), str(problem_path), "--search", search],

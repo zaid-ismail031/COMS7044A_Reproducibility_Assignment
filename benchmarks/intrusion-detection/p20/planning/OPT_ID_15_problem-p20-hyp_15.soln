@@ -1,0 +1,22 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 17
+0 : (recon aries) [1]
+1 : (recon cassiopea) [1]
+2 : (recon scorpio) [1]
+3 : (break-into scorpio) [1]
+4 : (break-into cassiopea) [1]
+5 : (break-into aries) [1]
+6 : (clean scorpio) [1]
+7 : (gain-root scorpio) [1]
+8 : (download-files scorpio) [1]
+9 : (steal-data scorpio) [1]
+10 : (clean cassiopea) [1]
+11 : (modify-files cassiopea) [1]
+12 : (vandalize cassiopea) [1]
+13 : (clean aries) [1]
+14 : (gain-root aries) [1]
+15 : (download-files aries) [1]
+16 : (steal-data aries) [1]

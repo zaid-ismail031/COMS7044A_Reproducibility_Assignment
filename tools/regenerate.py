@@ -57,6 +57,8 @@ def run(domain, extra_args):
     spec = SPECS[domain]
     source_dir = ROOT / domain
     args = extra_args if extra_args else spec["args"]
+    for stale in source_dir.glob("*.tar.bz2"):
+        stale.unlink()
     subprocess.run(
         [sys.executable, "generator.py", *args],
         cwd=source_dir,

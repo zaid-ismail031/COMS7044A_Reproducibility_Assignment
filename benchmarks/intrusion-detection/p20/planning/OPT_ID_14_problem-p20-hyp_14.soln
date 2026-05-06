@@ -1,0 +1,21 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 16
+0 : (recon aries) [1]
+1 : (recon cassiopea) [1]
+2 : (recon libra) [1]
+3 : (break-into libra) [1]
+4 : (break-into cassiopea) [1]
+5 : (break-into aries) [1]
+6 : (clean libra) [1]
+7 : (gain-root libra) [1]
+8 : (download-files libra) [1]
+9 : (steal-data libra) [1]
+10 : (clean cassiopea) [1]
+11 : (modify-files cassiopea) [1]
+12 : (vandalize cassiopea) [1]
+13 : (clean aries) [1]
+14 : (modify-files aries) [1]
+15 : (vandalize aries) [1]

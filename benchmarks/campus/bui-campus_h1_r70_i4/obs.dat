@@ -1,5 +1,5 @@
+(MOVE watson_theater psychology_bldg)
 (MOVE psychology_bldg bank)
 (MOVE bank davis_theater)
-(MOVE davis_theater tav)
-(MOVE tav jones_theater)
-(MOVE jones_theater psychology_bldg)
+(MOVE davis_theater jones_theater)
+(MOVE jones_theater tav)

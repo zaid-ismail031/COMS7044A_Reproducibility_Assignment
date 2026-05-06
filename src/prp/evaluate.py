@@ -33,7 +33,7 @@ def load_instances(domain_dir):
 
 
 def find_soln(instance_dir, hyp_idx):
-    matches = list((instance_dir / "planning").glob(f"OPT_*_hyp_{hyp_idx}.soln"))
+    matches = list((instance_dir / "planning").glob(f"OPT_*hyp_{hyp_idx}.soln"))
     return matches[0] if matches else None
 
 
@@ -60,6 +60,7 @@ def trial(domain_text, instance_dir, problem_paths, true_idx, obs_pct):
             _, cost_c = plan(tmp_dir / "d_c.pddl", tmp_dir / "p_c.pddl")
             _, cost_n = plan(tmp_dir / "d_n.pddl", tmp_dir / "p_n.pddl")
         if cost_c is None or cost_n is None:
+            print(f"  ! no plan for {problem_path.name} (compliant={cost_c}, non={cost_n})")
             deltas.append(float("inf"))
         else:
             deltas.append(cost_c - cost_n)

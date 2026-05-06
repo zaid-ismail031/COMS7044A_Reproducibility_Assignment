@@ -1,0 +1,24 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 19
+0 : (load-truck obj21 tru21 pos21) [1]
+1 : (drive-truck tru21 pos21 apt2 cit2) [1]
+2 : (unload-truck obj21 tru21 apt2) [1]
+3 : (drive-truck tru11 pos11 pos13 cit1) [1]
+4 : (load-truck obj13 tru11 pos13) [1]
+5 : (load-airplane obj21 apn1 apt2) [1]
+6 : (drive-truck tru11 pos13 apt1 cit1) [1]
+7 : (unload-truck obj13 tru11 apt1) [1]
+8 : (load-airplane obj13 apn2 apt1) [1]
+9 : (fly-airplane apn2 apt1 apt2) [1]
+10 : (unload-airplane obj13 apn2 apt2) [1]
+11 : (load-truck obj13 tru21 apt2) [1]
+12 : (drive-truck tru21 apt2 pos23 cit2) [1]
+13 : (unload-truck obj13 tru21 pos23) [1]
+14 : (fly-airplane apn1 apt2 apt1) [1]
+15 : (unload-airplane obj21 apn1 apt1) [1]
+16 : (load-truck obj21 tru11 apt1) [1]
+17 : (drive-truck tru11 apt1 pos12 cit1) [1]
+18 : (unload-truck obj21 tru11 pos12) [1]

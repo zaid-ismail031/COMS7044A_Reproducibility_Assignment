@@ -1,0 +1,16 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 11
+0 : (activity-banking) [1]
+1 : (move bank bookmark_cafe) [1]
+2 : (activity-lunch) [1]
+3 : (move bookmark_cafe psychology_bldg) [1]
+4 : (activity-group-meeting-2) [1]
+5 : (move psychology_bldg davis_theater) [1]
+6 : (activity-take-lecture-3) [1]
+7 : (move davis_theater jones_theater) [1]
+8 : (activity-take-lecture-4) [1]
+9 : (move jones_theater angazi_cafe) [1]
+10 : (activity-group-meeting-3) [1]

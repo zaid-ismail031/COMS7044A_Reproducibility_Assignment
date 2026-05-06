@@ -1,0 +1,19 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 14
+0 : (recon scorpio) [1]
+1 : (recon virgo) [1]
+2 : (break-into virgo) [1]
+3 : (break-into scorpio) [1]
+4 : (clean virgo) [1]
+5 : (gain-root virgo) [1]
+6 : (download-files virgo) [1]
+7 : (steal-data virgo) [1]
+8 : (clean scorpio) [1]
+9 : (gain-root scorpio) [1]
+10 : (modify-files scorpio) [1]
+11 : (download-files scorpio) [1]
+12 : (steal-data scorpio) [1]
+13 : (vandalize scorpio) [1]

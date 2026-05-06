@@ -1,0 +1,12 @@
+(define
+  (domain BLOCKS)
+  (:requirements :strips :typing :equality :negative-preconditions)
+  (:types block)
+  (:constants S T A R H C U K - block)
+  (:predicates (on ?x ?y - block) (ontable ?x - block) (clear ?x - block) (handempty) (holding ?x - block) (obs_0) (obs_1))
+  (:action pick-up :parameters (?x - block) :precondition (and (clear ?x) (ontable ?x) (handempty)) :effect (and (not (ontable ?x)) (not (clear ?x)) (not (handempty)) (holding ?x)))
+  (:action put-down :parameters (?x - block) :precondition (holding ?x) :effect (and (not (holding ?x)) (clear ?x) (handempty) (ontable ?x)))
+  (:action stack :parameters (?x ?y - block) :precondition (and (holding ?x) (clear ?y) (not (= ?x ?y))) :effect (and (not (holding ?x)) (not (clear ?y)) (clear ?x) (handempty) (on ?x ?y)))
+  (:action unstack :parameters (?x ?y - block) :precondition (and (on ?x ?y) (clear ?x) (handempty) (not (= ?x ?y))) :effect (and (holding ?x) (clear ?y) (not (clear ?x)) (not (handempty)) (not (on ?x ?y))))
+  (:action unstack__obs1 :parameters () :precondition (and (on s a) (clear s) (handempty) (not (= s a)) (obs_0)) :effect (and (holding s) (clear a) (not (clear s)) (not (handempty)) (not (on s a)) (obs_1)))
+)

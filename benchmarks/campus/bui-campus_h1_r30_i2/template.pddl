@@ -4,7 +4,7 @@
 )
 (:init
 (= (total-cost) 0)
-(at bank)
+(at davis_theater)
 )
 (:goal
 (and

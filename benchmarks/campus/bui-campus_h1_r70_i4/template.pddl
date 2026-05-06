@@ -4,7 +4,7 @@
 )
 (:init
 (= (total-cost) 0)
-(at tav)
+(at watson_theater)
 )
 (:goal
 (and

@@ -1,0 +1,11 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 6
+0 : (pick-up r) [1]
+1 : (stack r t) [1]
+2 : (pick-up u) [1]
+3 : (stack u r) [1]
+4 : (pick-up c) [1]
+5 : (stack c u) [1]

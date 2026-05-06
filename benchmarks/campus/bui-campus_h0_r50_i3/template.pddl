@@ -4,7 +4,7 @@
 )
 (:init
 (= (total-cost) 0)
-(at psychology_bldg)
+(at tav)
 )
 (:goal
 (and

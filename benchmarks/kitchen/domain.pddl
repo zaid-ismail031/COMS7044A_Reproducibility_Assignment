@@ -3,9 +3,9 @@
 	(:types objects useable)
 	(:constants
 		water_jug keetle cloth tea_bag cup sugar bowl milk
-		cereal creamer cup sugar coffee bread cheese plate
-		bread toaster butter knife peanut_butter spoon
-		pill_box juice popcorn dressing salad_tosser 
+		cereal creamer coffee bread cheese plate
+		butter knife peanut_butter spoon
+		pill_box juice popcorn dressing salad_tosser
 		lunch_bag - object
 		microwave phone toaster plants - useable )
 	(:predicates

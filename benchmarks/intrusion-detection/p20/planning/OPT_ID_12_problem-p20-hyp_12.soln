@@ -1,0 +1,22 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 17
+0 : (recon andromeda) [1]
+1 : (recon leo) [1]
+2 : (recon libra) [1]
+3 : (break-into libra) [1]
+4 : (break-into leo) [1]
+5 : (break-into andromeda) [1]
+6 : (clean libra) [1]
+7 : (gain-root libra) [1]
+8 : (download-files libra) [1]
+9 : (steal-data libra) [1]
+10 : (clean leo) [1]
+11 : (modify-files leo) [1]
+12 : (vandalize leo) [1]
+13 : (clean andromeda) [1]
+14 : (gain-root andromeda) [1]
+15 : (download-files andromeda) [1]
+16 : (steal-data andromeda) [1]

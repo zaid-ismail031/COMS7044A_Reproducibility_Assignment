@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 from pathlib import Path
@@ -66,6 +67,20 @@ def compile_problem(domain_text, problem_text, observations, *, non_compliant):
     obs = [f"obs_{i}" for i in range(m + 1)]
 
     find(domain, ":predicates").extend([fluent] for fluent in obs)
+
+    problem_objects = find(problem, ":objects")
+    if problem_objects is not None and len(problem_objects) > 1:
+        domain_constants = find(domain, ":constants")
+        if domain_constants is None:
+            domain_constants = [":constants"]
+            insert_at = 2
+            for idx, item in enumerate(domain):
+                if isinstance(item, list) and item and isinstance(item[0], str) \
+                        and item[0].lower() in (":requirements", ":types"):
+                    insert_at = idx + 1
+            domain.insert(insert_at, domain_constants)
+        domain_constants.extend(problem_objects[1:])
+        del problem_objects[1:]
 
     for i, (name, args) in enumerate(observations, start=1):
         original = next(
