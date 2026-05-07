@@ -3,7 +3,9 @@ from __future__ import annotations
 import argparse
 import csv
 import re
+import sys
 import tempfile
+import time
 from pathlib import Path
 
 from compiler import compile_problem
@@ -43,7 +45,10 @@ def trial(domain_text, instance_dir, problem_paths, true_idx, obs_pct):
         return None
     observations = sample_observations(soln, obs_pct)
     deltas = []
-    for problem_path in problem_paths:
+    k = len(problem_paths)
+    for j, problem_path in enumerate(problem_paths, start=1):
+        sys.stdout.write(f"\r    candidate {j}/{k} (obs={len(observations)})    ")
+        sys.stdout.flush()
         problem_text = problem_path.read_text(encoding="utf-8")
         domain_compliant, problem_compliant = compile_problem(
             domain_text, problem_text, observations, non_compliant=False
@@ -60,10 +65,13 @@ def trial(domain_text, instance_dir, problem_paths, true_idx, obs_pct):
             _, cost_c = plan(tmp_dir / "d_c.pddl", tmp_dir / "p_c.pddl")
             _, cost_n = plan(tmp_dir / "d_n.pddl", tmp_dir / "p_n.pddl")
         if cost_c is None or cost_n is None:
-            print(f"  ! no plan for {problem_path.name} (compliant={cost_c}, non={cost_n})")
+            sys.stdout.write("\r")
+            print(f"    ! no plan for {problem_path.name} (compliant={cost_c}, non={cost_n})")
             deltas.append(float("inf"))
         else:
             deltas.append(cost_c - cost_n)
+    sys.stdout.write("\r" + " " * 60 + "\r")
+    sys.stdout.flush()
     return deltas, len(observations)
 
 
@@ -80,6 +88,32 @@ def load_done(csv_path, beta):
     return done
 
 
+def count_pending(root, pct_list, done):
+    total = 0
+    for domain_dir in sorted(p for p in root.iterdir() if p.is_dir()):
+        domain = domain_dir.name
+        if not (domain_dir / "domain.pddl").exists():
+            continue
+        for instance_dir, problems in load_instances(domain_dir):
+            instance = instance_dir.name
+            for true_idx in range(len(problems)):
+                for pct in pct_list:
+                    if (domain, instance, pct, true_idx) not in done:
+                        total += 1
+    return total
+
+
+def fmt_eta(seconds):
+    seconds = int(seconds)
+    h, rem = divmod(seconds, 3600)
+    m, s = divmod(rem, 60)
+    if h:
+        return f"{h}h{m:02d}m"
+    if m:
+        return f"{m}m{s:02d}s"
+    return f"{s}s"
+
+
 def run(root, out_path, beta, pct_list):
     out_path.parent.mkdir(parents=True, exist_ok=True)
     done = load_done(out_path, beta)
@@ -88,6 +122,12 @@ def run(root, out_path, beta, pct_list):
     writer = csv.DictWriter(handle, fieldnames=FIELDS)
     if new_file:
         writer.writeheader()
+
+    total = count_pending(root, pct_list, done)
+    print(f"=== {total} trials pending (beta={beta}) ===")
+    started = time.time()
+    completed = 0
+    correct_count = 0
 
     for domain_dir in sorted(p for p in root.iterdir() if p.is_dir()):
         domain = domain_dir.name
@@ -102,15 +142,27 @@ def run(root, out_path, beta, pct_list):
                     key = (domain, instance, pct, true_idx)
                     if key in done:
                         continue
-                    print(f"{domain}/{instance} true={true_idx} pct={pct}")
+                    completed += 1
+                    elapsed = time.time() - started
+                    eta = elapsed / completed * (total - completed) if completed else 0
+                    accuracy = (correct_count / max(completed - 1, 1)) if completed > 1 else 0
+                    print(
+                        f"[{completed}/{total} | {fmt_eta(elapsed)} elapsed, ~{fmt_eta(eta)} left | "
+                        f"acc={accuracy:.0%}] {domain}/{instance} true={true_idx} pct={pct}",
+                        flush=True,
+                    )
+                    trial_started = time.time()
                     result = trial(
                         domain_text, instance_dir, problems, true_idx, pct
                     )
                     if result is None:
+                        print("    skipped (no .soln for true goal)", flush=True)
                         continue
                     deltas, obs_count = result
                     probs = posterior(deltas, beta=beta)
                     predicted, spread = predict(probs)
+                    correct = int(predicted == true_idx)
+                    correct_count += correct
                     writer.writerow({
                         "domain": domain,
                         "instance": instance,
@@ -118,14 +170,20 @@ def run(root, out_path, beta, pct_list):
                         "true_idx": true_idx,
                         "predicted_idx": predicted,
                         "spread": spread,
-                        "correct": int(predicted == true_idx),
+                        "correct": correct,
                         "obs_count": obs_count,
                         "deltas": ",".join(str(d) for d in deltas),
                         "posterior": ",".join(f"{p:.4f}" for p in probs),
                         "beta": beta,
                     })
                     handle.flush()
+                    print(
+                        f"    -> predicted={predicted} {'OK' if correct else 'WRONG'} "
+                        f"spread={spread} ({fmt_eta(time.time() - trial_started)})",
+                        flush=True,
+                    )
     handle.close()
+    print(f"=== done. {completed} trials, {correct_count} correct, {fmt_eta(time.time() - started)} total ===")
 
 
 def main():
