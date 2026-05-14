@@ -54,17 +54,15 @@ def main():
     print(n.to_string())
 
     if args.out:
-        with args.out.open("w") as handle:
-            handle.write("# Recognition results\n\n")
-            handle.write("## Accuracy\n\n")
-            handle.write(accuracy.to_markdown())
-            handle.write("\n\n## Spread |G*|\n\n")
-            handle.write(spread.to_markdown())
-            handle.write("\n\n## Q\n\n")
-            handle.write(q.to_markdown())
-            handle.write("\n\n## Trial counts\n\n")
-            handle.write(n.to_markdown())
-            handle.write("\n")
+        summary = (
+            df.groupby(["domain", "obs_pct"])
+              .agg(n=("correct", "count"),
+                   accuracy=("correct", "mean"),
+                   spread=("spread", "mean"),
+                   q=("q", "mean"))
+              .reset_index()
+        )
+        summary.to_csv(args.out, index=False, float_format="%.4f")
         print(f"\nwrote {args.out}")
 
 
