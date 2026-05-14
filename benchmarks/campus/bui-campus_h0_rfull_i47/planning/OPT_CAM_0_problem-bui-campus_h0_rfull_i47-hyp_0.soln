@@ -1,0 +1,13 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 8
+0 : (activity-take-lecture-1) [1]
+1 : (move watson_theater bookmark_cafe) [1]
+2 : (activity-breakfast) [1]
+3 : (activity-group-meeting-1) [1]
+4 : (move bookmark_cafe hayman_theater) [1]
+5 : (activity-take-lecture-2) [1]
+6 : (move hayman_theater angazi_cafe) [1]
+7 : (activity-coffee) [1]

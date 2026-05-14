@@ -1,0 +1,5 @@
+(MOVE hayman_theater psychology_bldg)
+(MOVE psychology_bldg bank)
+(MOVE bank davis_theater)
+(MOVE jones_theater tav)
+(MOVE tav angazi_cafe)

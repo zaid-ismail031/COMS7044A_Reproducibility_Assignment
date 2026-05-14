@@ -1,0 +1,11 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 6
+0 : (take bread) [1]
+1 : (take cheese) [1]
+2 : (take lunch_bag) [1]
+3 : (take plate) [1]
+4 : (activity-make-cheese-sandwich) [1]
+5 : (activity-pack-lunch) [1]

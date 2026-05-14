@@ -4,7 +4,7 @@
 )
 (:init
 (= (total-cost) 0)
-(at cbs)
+(at jones_theater)
 )
 (:goal
 (and

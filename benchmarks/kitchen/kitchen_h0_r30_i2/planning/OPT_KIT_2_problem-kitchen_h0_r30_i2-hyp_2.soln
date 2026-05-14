@@ -1,0 +1,10 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 5
+0 : (take bowl) [1]
+1 : (take plate) [1]
+2 : (take salad_tosser) [1]
+3 : (activity-make-salad) [1]
+4 : (activity-make-dinner) [1]
