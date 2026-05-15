@@ -1,0 +1,8 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 3
+0 : (move node_a node_c) [1]
+1 : (move node_c node_d) [1]
+2 : (move node_d node_g) [1]

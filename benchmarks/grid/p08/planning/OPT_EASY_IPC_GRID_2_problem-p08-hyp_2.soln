@@ -1,0 +1,12 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 7
+0 : (move node_a node_c) [1]
+1 : (pickup node_c key0) [1]
+2 : (move node_c node_d) [1]
+3 : (unlock node_d node_e key0 triangle) [1]
+4 : (move node_d node_e) [1]
+5 : (move node_e node_f) [1]
+6 : (move node_f node_j) [1]

@@ -1,0 +1,169 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2019
+
+% ready for submission
+% \usepackage{neurips_2019}
+
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2019}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[preprint]{neurips_2019}
+
+% to avoid loading the natbib package, add option nonatbib:
+%     \usepackage[nonatbib]{neurips_2019}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage[normalem]{ulem}
+\newif{\ifhidecomments}
+
+
+\title{[Re] Utilising Uncertainty for Efficient Learning of Likely-
+Admissible Heuristics}
+
+
+\author{%
+  David S.~Hippocampus, Jeremiah T. Puddleduck \\
+  School of Computer Science and Applied Mathematics\\
+  University of the Witwatersrand\\
+  Johannesburg, South Africa \\
+  \texttt{\{hippo, puddleduck\}@wits.ac.za} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\section*{\centering Reproducibility Summary}
+
+\textit{This summary \textbf{must fit} in the first page, no exception will be allowed. 
+}
+
+\subsection*{Scope of Reproducibility}
+
+State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
+This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+
+\subsection*{Methodology}
+
+Briefly describe what you did and which resources you used. For example, did refer to the author's code? Or did you implement the method only from the paper's description? Did you recreate the environments, or use existing implementations? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+
+\subsection*{Results}
+
+Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+
+\subsection*{What was easy}
+
+Describe which parts of your reproduction study were easy. For example, was it  easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+
+\subsection*{What was difficult}
+
+Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the environment description was insufficient and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+
+\newpage
+
+\section{Introduction}
+
+A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work. It should be clear from the introduction that you understand the purpose of the paper and what problem the authors are trying to address. It is not strictly necessary to include citations to other related work (although you are more than welcome to). 
+
+\section{Scope of reproducibility}
+\label{sec:claims}
+
+Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+
+A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
+This is concise, and is something that can be supported by experiments.
+An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+
+This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
+\begin{itemize}
+    \item Claim 1
+    \item Claim 2
+    \item Claim 3
+\end{itemize}
+
+Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
+Where possible, explicitly make these connections (e.g. Claim 1 is supported by Experiment 1 in Figure 1)
+
+\section{Background}
+
+In your own words, summarise the main conceptual ideas presented in the background section of the paper. Your description does not need to be as detailed as the original paper, but should briefly touch on the main concepts needed for the proposed method.
+
+You should then provide a high-level description of the method proposed in the paper. At an abstract level, how does it work? You do not need to write down pseudocode or any form of mathematics - a paragraph or two describing the main idea will suffice.
+
+\section{Methodology}
+Explain your approach - did you make use of the author's code, or did you aim to re-implement the approach from the description in the paper? Summarise the resources (code, documentation, libraries, GPUs) that you used.
+
+\subsection{Model descriptions}
+Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+
+\subsection{Environments}
+
+For each domain that the method is tested on, provide a description of how it operates, the state space representations, available actions, cost function, etc. Describe whether you implemented them from scratch, or whether you used or modified an existing one. 
+
+\subsection{Hyperparameters}
+Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+\subsection{Experimental setup and code}
+Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
+Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, etc).
+Provide a link to your code.
+
+\subsection{Computational requirements}
+Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
+For each experiment, include the total computational requirements (e.g. the total CPU/GPU hours spent).
+(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+
+\section{Results}
+\label{sec:results}
+Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+
+
+\subsection{Results reproducing original paper}
+For each experiment, say 1) which claim in Section~\ref{sec:claims} it supports, and 2) if it successfully reproduced the associated experiment in the original paper. 
+For example, an experiment training and evaluating a model on a dataset may support a claim that that model outperforms some baseline.
+Logically group related results into sections. 
+
+\subsubsection{Result 1}
+
+\subsubsection{Result 2}
+
+\subsection{Results beyond original paper}
+Often papers don't include enough information to fully specify their experiments, so some additional experimentation may be necessary. For example, it might be the case that some hyperparameter was not specified, and so different values need to be evaluated to reproduce the original results. Include the results of any additional experiments here, if needed. 
+ 
+\subsubsection{Additional Result 1}
+\subsubsection{Additional Result 2}
+
+\section{Discussion}
+
+Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+
+\subsection{What was easy}
+Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
+
+Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+
+\subsection{What was difficult}
+List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
+
+Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+
+
+\section*{References}
+
+Here include any references that you make use of throughout the report. Be sure to use LaTeX's built-in bibliography management system (see, e.g. \url{https://www.overleaf.com/learn/latex/Bibliography_management_with_bibtex}) 
+
+\end{document}

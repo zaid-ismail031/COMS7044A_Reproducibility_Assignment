@@ -1,0 +1,8 @@
+; Time 0.0
+; ParsingTime 0.0
+; NrActions 
+; MakeSpan 
+; MetricValue 3
+0 : (pickup node_c key1) [1]
+1 : (unlock node_c node_b key1 square) [1]
+2 : (move node_c node_b) [1]
