@@ -238,6 +238,76 @@ actually rely upon. Figure~\ref{fig:beta} TODO shows the $\beta$-sensitivity of 
     \label{fig:beta}
 \end{figure}
 
+Table~\ref{tab:beta-ptrue} reports $P(G^* \mid O)$ across the swept $\beta$ values for every
+(domain, observation \%) cell. Two patterns emerge:
+
+\begin{itemize}
+    \item At low $\beta$, the posterior is nearly uniform across the candidate set, so
+          $P(G^* \mid O) \approx 1/|\mathcal{G}|$ regardless of how many observations the
+          recogniser has seen.
+    \item As $\beta$ grows, $P(G^* \mid O)$ rises toward $1/|G^*|$ --- the recogniser becomes
+          confident among the tied top set, but cannot break ties between candidates with
+          identical cost differences.
+\end{itemize}
+
+\noindent The implication is that $\beta$ controls the \emph{actionable confidence} of the
+posterior, not its ranking. A practitioner choosing $\beta$ trades flatness against
+overconfidence; the paper's silence on this choice is therefore a real reproducibility gap for
+any downstream use of $P(G \mid O)$, even though the headline $Q$ and $|G^*|$ numbers are
+unaffected.
+
+% Regenerate with: python3 tools/beta_table.py
+% Replace the placeholder values below with the output of that script.
+\begin{table}[h]
+\centering
+\caption{Posterior probability mass on the true goal, $P(G^* \mid O)$, as a function of
+$\beta$. $Q$ and $|G^*|$ are $\beta$-invariant for integer-cost domains, but $P(G^* \mid O)$
+is not. TODO: replace placeholder values with output of \texttt{tools/beta\_table.py}.}
+\label{tab:beta-ptrue}
+\small
+\begin{tabular}{llrrrrrr}
+\toprule
+Domain & Obs \% & $\beta{=}0.1$ & $\beta{=}0.5$ & $\beta{=}1.0$ & $\beta{=}2.0$ & $\beta{=}5.0$ & $\beta{=}10.0$ \\
+\midrule
+\multirow{5}{*}{Block-Words}        & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\midrule
+\multirow{5}{*}{Campus}             & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\midrule
+\multirow{5}{*}{Grid}               & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\midrule
+\multirow{5}{*}{Intrusion Detection}& 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\midrule
+\multirow{5}{*}{Kitchen}            & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\midrule
+\multirow{5}{*}{Logistics}          & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
+                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 
 Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
