@@ -40,12 +40,18 @@ def main():
         posterior = [float(x) for x in row["posterior"].split(",")]
         return float(posterior[int(row["true_idx"])] == max(posterior))
 
+    def mass_on_true(row):
+        posterior = [float(x) for x in row["posterior"].split(",")]
+        return posterior[int(row["true_idx"])]
+
     df["q_paper"] = df.apply(in_top_set, axis=1)
+    df["p_true"] = df.apply(mass_on_true, axis=1)
 
     accuracy = summarise(df, "correct", "{:.2%}")
     spread = summarise(df, "spread", "{:.2f}")
     q = summarise(df, "q", "{:.2f}")
     q_paper = summarise(df, "q_paper", "{:.2f}")
+    p_true = summarise(df, "p_true", "{:.3f}")
     n = counts(df)
 
     print("=== Accuracy (recognizer's top set contains the true goal) ===")
@@ -60,6 +66,9 @@ def main():
     print("=== Q_paper = fraction where true goal is in the tied top set ===")
     print(q_paper.to_string())
     print()
+    print("=== P(true | O) = posterior mass on the true goal (β-sensitive) ===")
+    print(p_true.to_string())
+    print()
     print("=== Trial counts ===")
     print(n.to_string())
 
@@ -70,7 +79,8 @@ def main():
                    accuracy=("correct", "mean"),
                    spread=("spread", "mean"),
                    q=("q", "mean"),
-                   q_paper=("q_paper", "mean"))
+                   q_paper=("q_paper", "mean"),
+                   p_true=("p_true", "mean"))
               .reset_index()
         )
         summary.to_csv(args.out, index=False, float_format="%.4f")
