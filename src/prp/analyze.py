@@ -36,9 +36,16 @@ def main():
 
     df["q"] = df["correct"] / df["spread"]
 
+    def in_top_set(row):
+        posterior = [float(x) for x in row["posterior"].split(",")]
+        return float(posterior[int(row["true_idx"])] == max(posterior))
+
+    df["q_paper"] = df.apply(in_top_set, axis=1)
+
     accuracy = summarise(df, "correct", "{:.2%}")
     spread = summarise(df, "spread", "{:.2f}")
     q = summarise(df, "q", "{:.2f}")
+    q_paper = summarise(df, "q_paper", "{:.2f}")
     n = counts(df)
 
     print("=== Accuracy (recognizer's top set contains the true goal) ===")
@@ -50,6 +57,9 @@ def main():
     print("=== Q = correct / spread (paper's headline metric) ===")
     print(q.to_string())
     print()
+    print("=== Q_paper = fraction where true goal is in the tied top set ===")
+    print(q_paper.to_string())
+    print()
     print("=== Trial counts ===")
     print(n.to_string())
 
@@ -59,7 +69,8 @@ def main():
               .agg(n=("correct", "count"),
                    accuracy=("correct", "mean"),
                    spread=("spread", "mean"),
-                   q=("q", "mean"))
+                   q=("q", "mean"),
+                   q_paper=("q_paper", "mean"))
               .reset_index()
         )
         summary.to_csv(args.out, index=False, float_format="%.4f")
