@@ -1,5 +1,13 @@
 # COMS7044A Reproducibility Assignment
 
+Group:
+
+- Okwukwechukwu Mbajiorgu (2430639)
+- Zaid Ismail (1695814)
+- Michael Anokye-Boateng (2382971)
+
+School of Computer Science and Applied Mathematics, University of the Witwatersrand.
+
 Independent reproduction of:
 
 > Miquel Ramirez and Hector Geffner. *Probabilistic Plan Recognition Using Off-the-Shelf Classical Planners*. AAAI-10, 2010.
@@ -212,7 +220,3 @@ Two of the upstream PDDL files have syntax errors that Fast Downward rejects. Bo
 | FD build fails with `concept does not name a type` | g++ is older than 11. `sudo apt install g++-11; export CXX=g++-11; rm -rf builds; ./build.py`. |
 | `demo.sh` errors with `pv: not found` | `sudo apt install pv`. |
 | `tree: command not found` | `sudo apt install tree`. |
-
-## Group
-
-Okwukwechukwu Mbajiorgu, Zaid Ismail, Michael Anokye-Boateng. School of Computer Science and Applied Mathematics, University of the Witwatersrand.
