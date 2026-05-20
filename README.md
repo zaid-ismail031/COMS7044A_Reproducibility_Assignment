@@ -171,25 +171,6 @@ pd.concat(frames, ignore_index=True).to_csv('beta_sweep.csv', index=False)
 
 See `SUMMARY.md` for a description of every column in the summary CSVs.
 
-## Compiling the report
-
-```bash
-cd reproducibility_assignment
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
-```
-
-Or with `latexmk`:
-
-```bash
-cd reproducibility_assignment
-latexmk -pdf main.tex
-```
-
-The bundled `neurips_2019.sty` has its footer suppressed so the report does not falsely identify itself as a NeurIPS publication. If you replace it with a fresh copy from the template, the footer comes back.
-
 ## Live demo
 
 A scripted walkthrough of the pipeline on one example from the intrusion-detection domain.
