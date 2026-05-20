@@ -12,7 +12,7 @@
 %     \usepackage[preprint]{neurips_2019}
 
 % to compile a camera-ready version, add the [final] option, e.g.:
-\usepackage[preprint]{neurips_2019}
+\usepackage[final]{neurips_2019}
 
 % to avoid loading the natbib package, add option nonatbib:
 %     \usepackage[nonatbib]{neurips_2019}
@@ -22,28 +22,36 @@
 \usepackage{hyperref}       % hyperlinks
 \usepackage{url}            % simple URL typesetting
 \usepackage{booktabs}       % professional-quality tables
+\usepackage{multirow}       % multi-row table cells
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
-\usepackage{multirow}       % multi-row table cells
-\usepackage{graphicx}       % \includegraphics
-\usepackage{caption}        % nicer captions
+\usepackage{float}          % [H] table placement
+\usepackage{enumitem}       % itemize/enumerate options
+\usepackage{placeins}       % \FloatBarrier to pin floats within sections
 
 \usepackage[dvipsnames]{xcolor}
 \usepackage[normalem]{ulem}
 \newif{\ifhidecomments}
 
+% Wits Citation Style
+\usepackage{natbib}
+\input{natbib-add}
+\bibliographystyle{named-wits}
+\bibpunct{[}{]}{;}{a}{}{}
+\setlength{\skip\footins}{1.5cm}
+\newcommand{\citets}[1]{\citeauthor{#1}'s \citeyearpar{#1}}
+\renewcommand\bibname{References}
 
-\title{[Re] Utilising Uncertainty for Efficient Learning of Likely-
-Admissible Heuristics}
+
+\title{[Re] Probabilistic Plan Recognition Using Off-the-Shelf Classical Planners}
 
 
 \author{%
-  David S.~Hippocampus, Jeremiah T. Puddleduck \\
-  School of Computer Science and Applied Mathematics\\
-  University of the Witwatersrand\\
+  Okwukwechukwu Mbajiorgu, Zaid Ismail, Michael Anokye-Boateng \\
+  School of Computer Science and Applied Mathematics \\
+  University of the Witwatersrand \\
   Johannesburg, South Africa \\
-  \texttt{\{hippo, puddleduck\}@wits.ac.za} \\
 }
 
 \begin{document}
@@ -52,102 +60,256 @@ Admissible Heuristics}
 
 \section*{\centering Reproducibility Summary}
 
-\textit{This summary \textbf{must fit} in the first page, no exception will be allowed. 
-}
-
 \subsection*{Scope of Reproducibility}
 
-State the main claim(s) of the original paper you are trying to reproduce (typically the main claim(s) of the paper).
-This is meant to place the work in context, and to tell a reader the objective of the reproduction.
+We reproduce the experiments of \citet{ramirez2010probabilistic}, who describe a goal recognition method that compiles each (problem, observation) pair into two classical planning problems and converts the resulting cost difference into a posterior over candidate goals. We test four claims drawn from Table~1 of the original paper. The first three concern the behaviour of the recognition quality \(Q\) and the spread \(|G^*|\) across observation percentages and domains. The fourth is an extension claim about the role of the Boltzmann constant \(\beta\), which the original paper does not specify.
 
 \subsection*{Methodology}
 
-Briefly describe what you did and which resources you used. For example, did refer to the author's code? Or did you implement the method only from the paper's description? Did you recreate the environments, or use existing implementations? You can also use this space to list the hardware used, and the total budget (e.g. GPU hours) for the experiments. 
+We re-implemented the pipeline from scratch in Python as four modules: a PDDL compiler, a Fast Downward subprocess wrapper, a Boltzmann scoring layer, and an evaluation driver. We did not use the authors' code. Benchmark domains come from the authors' distribution. To keep the loop uniform across domains, we sample observations from precomputed optimal plans in every domain, including Campus and Kitchen where the paper samples from stochastic suboptimal traces. This simplifies the pipeline at the cost of making those two domains structurally easier to recognise. The \(\beta = 1.0\) run took roughly two hours for 1885 trials. The full \(\beta\) sweep across six values took close to sixteen hours.
 
 \subsection*{Results}
 
-Start with your overall conclusion --- where did your results reproduce the original paper, and where did your results differ? Be specific and use precise language, e.g. "we reproduced the accuracy to within 1\% of reported value, which supports the paper's conclusion that it outperforms the baselines". Getting exactly the same number is in most cases infeasible, so you'll need to use your judgement to decide if your results support the original claim of the paper.
+Recognition quality \(Q\) reproduces in every directly comparable cell. Because we sample from optimal plans, \(Q\) saturates at 1.00, making Claims 1 and 2 trivially true under \(Q\). We therefore read both claims through the spread metric. Spread decreases monotonically in all six of our domains and in four of six in the paper, supporting Claim~1. It falls below 2 by 50\% observation in five of six domains in both reproductions, supporting Claim~2 with Block-Words as the common failure mode. At low observation percentages our spread exceeds the paper's by factors of 1.6 to 2.3 on Block-Words, Intrusion-Detection and Kitchen. The \(\beta\) sweep shows that \(Q\) and \(|G^*|\) are mathematically invariant under \(\beta\) for integer action costs. Only the posterior mass on the true goal \(P(G^* \mid O)\) varies with \(\beta\), from near-uniform at \(\beta = 0.1\) to sharp at \(\beta = 10\).
 
 \subsection*{What was easy}
 
-Describe which parts of your reproduction study were easy. For example, was it  easy to re-implement their method based on the description in the paper? The goal of this section is to summarize to a reader which parts of the original paper they could easily apply to their problem.
+The compilation in Definition~2 of the paper is mechanical once read carefully. We translated it to about a hundred lines of Python without difficulty. Fast Downward solved every compiled problem it was given. Four of the six domains shipped with ready-to-use PDDL files, which removed the need to generate observations from scratch in those domains.
 
 \subsection*{What was difficult}
 
-Describe which parts of your reproduction study were difficult or took much more time than you expected. Perhaps the environment description was insufficient and you couldn't verify some experiments, or the author's code was broken and had to be debugged first. Or, perhaps some experiments just take too much time/resources to run and you couldn't verify them. The purpose of this section is to indicate to the reader which parts of the original paper are either difficult to re-use, or require a significant amount of work and resources to verify.
+The paper does not state which value of \(\beta\) was used, and we spent time investigating this before concluding that the rank-based metrics are invariant under \(\beta\). Two of the shipped PDDL files contained syntax errors that Fast Downward rejected. The Campus and Kitchen domains shipped as Python~2 generator scripts that needed porting. The Grid domain ships only two instances, so we hand-expanded the set to get a usable sample size.
 
 \newpage
 
 \section{Introduction}
+The rapid growth of artificial intelligence and autonomous systems has increased the importance of accurately predicting and optimising the behaviour of intelligent agents. Goal recognition, the task of inferring an agent's intended objective from observations of its behaviour \citep{sciencedirect_goal_recognition}, is central to this challenge, with applications spanning natural language understanding \citep{cohen1981beyond}, multi-agent coordination \citep{huber1994automated}, intrusion detection \citep{geib2002requirements}, and assisted cognition \cite{pentney2006sensor}. Classical approaches to this problem have relied on pre-compiled plan libraries or policy sets \citep{kautz1986generalized, geib2009probabilistic}, which constrain both flexibility and scalability.
 
-A few sentences placing the work in high-level context. Limit it to a few paragraphs at most; your report is on reproducing a piece of work, you don’t have to motivate that work. It should be clear from the introduction that you understand the purpose of the paper and what problem the authors are trying to address. It is not strictly necessary to include citations to other related work (although you are more than welcome to). 
+A more principled class of approaches replaces the plan library with a domain theory from which plans are generated on demand. Planning-based methods simplify goal recognition by converting it into classical planning problems that can be solved by existing planners. Ramírez and Geffner \citep{ramirez2009planrecognition} introduced this perspective, demonstrating that goal recognition can be solved by invoking a lightly modified planner. Their later work extends goal recognition from a binary decision problem to a probabilistic one by estimating the posterior distribution \(P(G \mid O)\) for each candidate goal. Rather than producing a simple accept-or-reject judgement, the method evaluates the likelihood of a goal by comparing the cost of achieving it while complying with the observed actions against the cost of achieving it without complying with those observations. This inference is performed through only two calls to an unmodified classical planner.
+
+This report presents an independent reproduction of the experimental results reported in \citep{ramirez2010probabilistic}. We re-implement the PDDL compilation procedure described in Definition~2 and Proposition~3 of the paper, integrate Fast Downward \citep{helmert2006fast} as the underlying planner, and evaluate the method across the planning benchmark domains considered in the original work. Our aim is to assess whether the quantitative claims of the paper, specifically the recognition quality metric \(Q\) and goal spread \(S\) reported in Table~1, can be independently verified, and to document any ambiguities, implementation choices, or discrepancies encountered along the way.
+
+The remainder of the report is organised as follows. Section~\ref{sec:claims} lists the four claims we test. Section~\ref{sec:results} reports our experimental results and indicates which claims are supported by our data. The final discussion section comments on what was easy and what was difficult to reproduce.
 
 \section{Scope of reproducibility}
 \label{sec:claims}
 
-Introduce the specific setting or problem addressed in this work, and list the main claims from the original paper. Think of this as writing out the main contributions of the original paper. Each claim should be relatively concise; some papers may not clearly list their claims, and one must formulate them in terms of the presented experiments. (For those familiar, these claims are roughly the scientific hypotheses evaluated in the original work.)
+This work reproduces the experiments of \citep{ramirez2010probabilistic}, who propose a probabilistic goal recognition method that uses existing classical planners without modifying their internal algorithms. Given a planning domain, a set of candidate goals, and a partially observed action sequence, the method computes a posterior probability distribution \(P(G \mid O)\) over candidate goals by invoking an unmodified planner twice per goal. The first call finds the cheapest plan that complies with the observations. The second call finds the cheapest plan that does not. The resulting cost difference drives a Boltzmann likelihood which, combined with a uniform prior via Bayes' rule, gives the posterior distribution. The original paper tests the method across six domains with both optimal and non-optimal planners, reporting recognition quality \(Q\) (the fraction of trials in which the true goal is among the most likely) and spread \(S\) (the average number of tied top-ranked goals).
 
-A claim should be something that can be supported or rejected by your data. An example is, ``Finetuning pretrained BERT on dataset X will have higher accuracy than an LSTM trained with GloVe embeddings.''
-This is concise, and is something that can be supported by experiments.
-An example of a claim that is too vague, which can't be supported by experiments, is ``Contextual embedding models have shown strong performance on a number of tasks. We will run experiments evaluating two types of contextual embedding models on datasets X, Y, and Z."
+We test the following claims derived from the experimental results reported in Table~1 of the original paper:
 
-This section roughly tells a reader what to expect in the rest of the report. Clearly itemize the claims you are testing:
 \begin{itemize}
-    \item Claim 1
-    \item Claim 2
-    \item Claim 3
-\end{itemize}
+    \item \textbf{Claim 1:} Under optimal planning, the recognition quality \(Q\) is non-decreasing as the percentage of observed actions increases across all six planning domains.
 
-Each experiment in Section~\ref{sec:results} will support (at least) one of these claims, so a reader of your report should be able to separately understand the \emph{claims} and the \emph{evidence} that supports them.
-Where possible, explicitly make these connections (e.g. Claim 1 is supported by Experiment 1 in Figure 1)
+    \item \textbf{Claim 2:} Under optimal planning, the spread $|G^*|$ is at most 2 by 50\% observation in all six domains. We adopt this threshold as an operationalisation of the paper's qualitative claim that the method shows ``good precision''. The paper itself reports the spread values in Table~1 but does not single out a numerical threshold.
+
+    \item \textbf{Claim 3:} Under optimal planning, the average spread \(S\) converges to 1 at 100\% observation across all six domains, indicating that complete observations yield an unambiguous prediction.
+
+    \item \textbf{Claim 4 (Extension):} The effects of the parameter \(\beta\) in the Boltzmann likelihood, which is unspecified in the original paper.
+\end{itemize}
 
 \section{Background}
 
-In your own words, summarise the main conceptual ideas presented in the background section of the paper. Your description does not need to be as detailed as the original paper, but should briefly touch on the main concepts needed for the proposed method.
+Planning is an agent's ability to carry out a sequence of actions from its initial state to achieve a goal state. While a domain defines an area in which a set of goals can be achieved by the agent. Planning recognition involves observing an agent’s actions within a domain and then determining the goal the agent is working towards from the sequence of actions it performs. However, in a domain, there exist multiple possible goals that can be true. Since there may be multiple possible goal states within a domain, and an agent may not act rationally or follow the optimal action sequence from its initial state to its goal state, it is not immediately clear which goal an agent is targeting along its way.
 
-You should then provide a high-level description of the method proposed in the paper. At an abstract level, how does it work? You do not need to write down pseudocode or any form of mathematics - a paragraph or two describing the main idea will suffice.
+This is why probabilistic plan recognition is introduced to form a probability distribution over the goals an agent could be targeting within a domain, given the set of observations of its actions at a given time. These probabilities are determined using Bayes ' rule. The probability distribution ultimately shows the most likely goal an agent is trying to achieve given an observation of its actions, i.e., the posterior. To find this probability, a prior probability distribution over all the goals is already known, but the likelihood element of Bayes rule, which specifies the probability of an observation sequence given a goal, is determined by computing the difference between the cheapest cost of compliant plans to obtain a goal and the cheapest cost of non-compliant plans that lead to the agent still reaching its goal state.
+
+When handling observations of an agent's actions with off-the-shelf planners to compute costs, the original planning domain must be transformed into a new domain to identify the compliant and non-compliant plan costs. In this new domain, a fluent is evaluated for each observed action and linked together. This means a fluent is true only if it satisfies the observations at each step up to its current point. This makes it possible to compute a planning problem to find the cheapest compliant plan and the cheapest noncompliant plan for each goal state. These can then be used to calculate the likelihoods needed to get the posterior probability.
+
+The likelihood is calculated assuming a Boltzmann distribution, and the difference between the two costs influences the posterior probability. The lower the difference, the higher the probability, and the opposite when the difference is higher. This implies that it is easier to predict the observations for smaller differences. With this likelihood and prior distribution, it is then possible to compute the probability distribution over all goals in the domain.
+
+
+The method proposed in the paper by .\cite{ramirez2010probabilistic} addresses the problem of goal recognition for an agent in a domain. The method first transforms the original domain into a new domain. Then, for each candidate goal, the costs of the cheapest compliant and non-compliant plans are computed using a classical planner. The difference between these costs is used to calculate the likelihood of the observations given each goal, which is then combined with a prior distribution over goals to produce a posterior probability distribution over all possible goals. This probability distribution is updated as new observations are made.
 
 \section{Methodology}
-Explain your approach - did you make use of the author's code, or did you aim to re-implement the approach from the description in the paper? Summarise the resources (code, documentation, libraries, GPUs) that you used.
+\label{sec:methodology}
+We re-implemented the recognition pipeline from scratch in Python based on
+Definitions 2 and 3 and the Boltzmann likelihood given in \citep{ramirez2010probabilistic}. The classical planner is Fast Downward~\citep{helmert2006fast} invoked as a subprocess. Benchmark domains were obtained from the authors' distribution at
+\url{https://sites.google.com/site/prasplanning}. We did not use the authors' code.
 
 \subsection{Model descriptions}
-Include a description of each model or algorithm used. Be sure to list the type of model, the number of parameters, and other relevant info (e.g. if it's pretrained). 
+The recognition method has no learned parameters. It is an algorithmic pipeline with the
+following four stages, each implemented as a single Python module:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{PDDL compiler} (\texttt{src/prp/compiler.py}). For each candidate goal $G$
+          and observation sequence $O$, produces two compiled PDDL pairs. The first contains
+          plans that must include the observed actions ($G + O$). The second contains plans
+          that must omit at least one of them ($G + \overline{O}$). The transformation
+          introduces a chain of fresh fluents $\textit{obs}_0, \dots, \textit{obs}_m$ and
+          duplicates each observed action schema. Each duplicate binds its parameters to the
+          observed arguments and chains the $\textit{obs}_i$ fluents through preconditions
+          and effects.
+    \item \textbf{Planner wrapper} (\texttt{src/prp/planner.py}). Invokes Fast Downward as a
+          subprocess, parses the resulting \texttt{sas\_plan} or pre-computed \texttt{.soln}
+          file, and exposes a \texttt{plan(domain, problem) $\rightarrow$ (actions, cost)}
+          interface.
+    \item \textbf{Scoring} (\texttt{src/prp/scoring.py}). Converts the vector of cost
+          differences $\Delta(G_k, O) = c(G_k + O) - c(G_k + \overline{O})$ for the $K$
+          candidates into a posterior using a Boltzmann likelihood and uniform prior:
+          $P(G_k \mid O) \propto \exp(-\beta \cdot \Delta(G_k, O))$. Numerical stability is
+          handled by subtracting $\max_k(-\beta \cdot \Delta_k)$ before exponentiation.
+    \item \textbf{Evaluation driver} (\texttt{src/prp/evaluate.py}). Iterates over (domain,
+          instance, true goal, observation \%) combinations, calls the compiler and planner,
+          computes the posterior, and writes one CSV row per trial. The driver is resumable.
+          Interrupted runs continue from the last completed row.
+\end{enumerate}
 
 \subsection{Environments}
 
-For each domain that the method is tested on, provide a description of how it operates, the state space representations, available actions, cost function, etc. Describe whether you implemented them from scratch, or whether you used or modified an existing one. 
+We use the six benchmark domains reported in the original paper. Table~\ref{tab:domains}
+summarises the size of each domain and the number of recognition trials per cell in our
+experiment.
+
+\begin{table}[!ht]
+\centering
+\caption{Benchmark domains. $|\mathcal{G}|$ is the average number of candidate goals per
+instance. ``Instances'' counts the number of distinct (objects, initial state) tuples used.
+``Trials/cell'' is the number of recognition trials averaged at each observation percentage.}
+\label{tab:domains}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Domain & $|\mathcal{G}|$ & Instances & Trials/cell \\
+\midrule
+Block-Words           & 20.0 &  2 &  40 \\
+Campus                &  2.0 & 50 & 100 \\
+Grid                  &  2.6 &  8 &  21 \\
+Intrusion-Detection   & 15.0 &  2 &  30 \\
+Kitchen               &  3.0 & 50 & 150 \\
+Logistics             &  7.2 &  5 &  36 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Block-Words, Logistics, and Intrusion-Detection ship as static PDDL files in the authors' archive. Grid ships only two instances, so we hand-expanded the set to eight by writing six new instances on top of the two existing layouts. The new instances vary only in their candidate goal sets. The grid topology, key positions, and starting position are kept. Campus and Kitchen ship as Python~2 generator scripts that synthesise instances at random. We ported these to Python~3 and wrote a driver that runs the generator and expands the resulting archives into the same per-hypothesis layout used by the other domains.
 
 \subsection{Hyperparameters}
-Describe how the hyperparameter values were set. If there was a hyperparameter search done, be sure to include the range of hyperparameters searched over, the method used to search (e.g. manual search, random search, Bayesian optimization, etc.), and the best hyperparameters found. Include the number of total experiments (e.g. hyperparameter trials). You can also include all results from that search (not just the best-found results).
+
+The only hyperparameter in the recognition pipeline is the Boltzmann temperature $\beta$, which the original paper does not specify. We use $\beta = 1.0$ for all headline results. As part of the extension analysis in Section~\ref{sec:results} we sweep $\beta \in \{0.1, 0.5, 1.0, 2.0, 5.0, 10.0\}$ and report posterior probability mass on the true goal at each setting.
+
+A second implicit choice concerns how observation sequences are sampled. The paper takes $10\%, 30\%, 50\%, 70\%$ or $100\%$ of the actions of the hidden optimal plan, but does not say whether the sample is a prefix of the plan or a uniform random subset. We chose prefix sampling. For each trial, the first $\lceil p \cdot |\pi^*| \rceil$ actions of the optimal plan for the true goal are taken as the observation sequence $O$. This choice may account for some of the difference we see at low observation percentages.
+
+One consequence of sampling observation prefixes from optimal plans is that the recognition quality $Q$ saturates at 1.00 by construction. The compliant problem for the true goal always has a cost-zero solution, since the optimal plan for the true goal already contains $O$ as its prefix. So the true goal's cost difference is at most as large as any wrong goal's, and the true goal is therefore at least tied for the highest posterior in every trial. As a result, $Q$ is uninformative in our data and the substantive content of Claims 1 and 2 is carried by the spread metric instead. We discuss this in detail in Section~\ref{sec:results}.
 
 \subsection{Experimental setup and code}
-Include a description of how the experiments were set up that's clear enough a reader could replicate the setup. 
-Include a description of the specific measure used to evaluate the experiments (e.g. accuracy, etc).
-Provide a link to your code.
+For each (domain, instance, true goal index, observation \%) combination, the evaluation
+driver:
+\begin{enumerate}[leftmargin=*]
+    \item Locates the pre-computed optimal plan for the true goal
+          (\texttt{OPT\_*\_hyp\_K.soln}). If absent, it is computed once and cached.
+    \item Truncates the plan to the first $\lceil p \cdot |\pi^*| \rceil$ actions to form $O$.
+    \item For each of the $K$ candidate goals, compiles two PDDL pairs ($G_k + O$ and
+          $G_k + \overline{O}$), solves both with Fast Downward, and records the cost
+          difference $\Delta(G_k, O)$.
+    \item Computes the posterior using the Boltzmann likelihood, identifies the goals tied at
+          the maximum probability, and writes the trial's outcome to a CSV.
+\end{enumerate}
+
+Fast Downward is invoked with \texttt{--search "astar(lmcut())"}, yielding optimal-cost plans
+under the landmark-cut admissible heuristic. This configuration is the closest practical
+analogue to the paper's HSP$^*_f$ optimal planner.
+
+Evaluation metrics follow the paper's definitions. $Q$ is the fraction of trials in which the
+true goal is in the tied top-probability set, and $|G^*|$ is the average size of that set. We
+additionally report strict accuracy (predicted index exactly equals true index) and posterior
+mass on the true goal $P(G^* \mid O)$, the latter being our $\beta$-sensitive metric.
+
+All code is available at \url{https://github.com/zaid-ismail031/COMS7044A_Reproducibility_Assignment}.
+
+\paragraph{Upstream PDDL corrections.}
+
+Two domain files in the authors' archive contain syntax errors that prevent Fast Downward's
+translator from parsing them. We patched both, documented the fixes in the repository, and noted them here for transparency:
+
+\begin{itemize}[leftmargin=*]
+    \item \texttt{block-words/domain.pddl} contained the declaration
+          \texttt{(holding ?x -block)}, missing a space between \texttt{-} and \texttt{block}.
+          Fixed to \texttt{(holding ?x - block)}.
+    \item \texttt{kitchen/domain.pddl} listed \texttt{cup}, \texttt{sugar}, and \texttt{bread}
+          twice in the \texttt{:constants} block, and listed \texttt{toaster} as both an
+          \texttt{object} and a \texttt{useable}. We removed the duplicates and kept
+          \texttt{toaster} as a \texttt{useable} only (its only use site).
+\end{itemize}
+
+Both fixes are purely syntactical and do not alter the semantics of the domain.
 
 \subsection{Computational requirements}
-Include a description of the hardware used, such as the GPU or CPU the experiments were run on. 
-For each experiment, include the total computational requirements (e.g. the total CPU/GPU hours spent).
-(Note: you'll likely have to record this as you run your experiments, so it's better to think about it ahead of time). Generally, consider the perspective of a reader who wants to use the approach described in the paper --- list what they would find useful.
+Experiments were run inside WSL2 (Ubuntu 24.04) on an Intel(R) Core(TM) i7-12700H machine with
+64GB RAM. Fast Downward was compiled from source against \texttt{g++-11}.
+
+Each recognition trial requires $2K$ Fast Downward invocations, where $K$ is the number of
+candidate goals for the instance. The total number of trials per $\beta$ value is 1885. Total
+wall-clock time for the $\beta = 1.0$ run was approximately 2~hours. The full $\beta$ sweep
+across six values required approximately 15.7~hours. This is dominated by Fast Downward's
+search time on the compiled problems. The pipeline is fully serial and does not use the GPU.
 
 \section{Results}
 \label{sec:results}
-Start with a high-level overview of your results. Do your results support the main claims of the original paper? Keep this section as factual and precise as possible, reserve your judgement and discussion points for the next "Discussion" section. 
+We ran 1885 recognition trials per $\beta$ value across the six benchmark domains, with
+trial counts per (domain, observation~\%) cell as summarised in Table~\ref{tab:domains}. We
+report two ways of viewing the data. The first compares our values for $Q$ and $|G^*|$
+directly against Table~1 of \citep{ramirez2010probabilistic}. The second is an additional
+measurement of $P(G^* \mid O)$ across the $\beta$ sweep, which the original paper does not
+report.
+
+\textbf{Summary of findings.} Two of the four claims from Section~\ref{sec:claims} are
+supported by our data without qualification. Claim~1 (monotonic non-increasing spread)
+holds in all six of our domains and in four of six in the paper. Claim~4 (the $\beta$
+extension) is supported by the sweep. The other two are partial. Claim~2 ($|G^*| \leq 2$
+by 50\% observation) holds in five of six domains in both the paper and our reproduction,
+with Block-Words as the shared failure mode. Claim~3 (spread converges to one at full
+observation) holds in four of six domains in both reproductions. Across all directly
+comparable cells the paper's $Q$ values reproduce exactly. The spread $|G^*|$ is
+systematically larger than the paper's at low observation percentages, particularly on
+Block-Words and Intrusion-Detection, and converges to the paper's values at full
+observation. The $\beta$ sweep shows that for integer-cost domains the rank-based metrics
+$Q$ and $|G^*|$ are mathematically invariant under $\beta$. Only the posterior probability
+mass on the true goal $P(G^* \mid O)$ varies with $\beta$.
 
 
 \subsection{Results reproducing original paper}
 
-Tables~\ref{tab:q-comparison} and~\ref{tab:s-comparison} show the cell-by-cell comparison
-of our recognition quality $Q$ and spread $|G^*|$ against the values reported in the original
-paper's Table~1 (HSP$^*_f$ column, the optimal planner). $Q$ is the fraction of trials in
-which the true goal was in the tied top-probability set; $|G^*|$ is the average size of that
-top set across trials.
+Tables~\ref{tab:q-comparison} and~\ref{tab:s-comparison} show the cell-by-cell comparison of
+our recognition quality $Q$ and spread $|G^*|$ against the values reported in the original
+paper's Table~1 (HSP$^*_f$ column, the optimal planner). The three subsubsections below
+discuss the evidence for each of the first three claims of Section~\ref{sec:claims} in turn.
 
-\begin{table}[h]
+\subsubsection{Claim 1: $Q$ is non-decreasing in observation percentage}
+Table~\ref{tab:q-comparison} shows recognition quality $Q$ in our reproduction alongside the
+values from the paper's HSP$^*_f$ column. In our reproduction, $Q$ reaches 1.00 at every
+observation percentage in every domain. The paper's column is also non-decreasing across
+every row, with the lowest entry at Easy IPC Grid at 10\% observation ($Q = 0.75$) rising to
+1.00 by 30\% observation. Under $Q$ alone, Claim~1 is satisfied trivially, because $Q$
+saturates at the ceiling in almost every cell. 
+
+Q is monotonically non-decreasing because our paper's experimental setup guarantees the
+true goal is never ruled out. We always sample from an optimal plan, whereas the paper sometimes does not. The paper's Experimental Results section says explicitly:
+
+"The observation sequences are generated by sampling hidden optimal plans for a hidden goal in the first four domains, and by sampling hidden suboptimal plans for a hidden goal, in the others."
+
+So for Block-Words, Logistics, Grid, and Intrusion-Detection, the paper does what we do. It samples from an optimal plan. For Campus and Kitchen, the paper samples from a suboptimal plan that the generator simulated stochastically. We don't. We use the precomputed optimal plan from Fast Downward in every domain. This choice was made to ensure a uniform evaluation pipeline.
+
+The more informative view of the same claim is the spread metric, which captures the
+recogniser's decisiveness. A non-decreasing $Q$ paired with a falling spread tells us that
+the recogniser is keeping the true goal in its top set \emph{and} narrowing that set as it
+sees more of the agent's actions. Reading Table~\ref{tab:s-comparison} row by row, our
+spread is monotonically non-increasing in all six domains. The paper's spread is monotonic
+in four of six domains. Kitchen and Logistics in the paper show small non-monotonic dips at
+50\% observation (Kitchen rises from 1.21 to 1.33, Logistics from 1.07 to 1.20), likely
+artefacts of the small sample sizes in those cells.
+
+\textbf{Claim~1 is supported in every domain by both the paper and our reproduction.} Under
+$Q$ the support is trivial. Under spread, our reproduction is in fact stricter than the
+original paper, since our spread is monotonic in every domain.
+
+\begin{table}[!ht]
 \centering
-\caption{Recognition quality $Q$: ours vs.\ paper. $Q$ is the fraction of trials where the
-true goal is in the tied top-probability set. ``--'' indicates a cell where direct comparison
-is not meaningful (see notes).}
+\caption{\textbf{Recognition quality $Q$ (lenient correctness)}: ours vs.\ paper. A trial
+counts as correct if the true goal is among the goals tied for the highest posterior
+probability, regardless of how many other goals are tied with it. This is the metric
+reported in Table~1 of the original paper. Contrast with Table~\ref{tab:accuracy-strict},
+which requires a single, unique prediction to match the true goal.}
 \label{tab:q-comparison}
 \small
 \begin{tabular}{lrrrrr}
@@ -175,10 +337,83 @@ Logistics ($|\mathcal{G}|{=}7.2$)          & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[h]
+
+\FloatBarrier
+\subsubsection{Claim 2: $|G^*| \leq 2$ by 50\% observation}
+
+Reading the 50\% column of Table~\ref{tab:s-comparison}, the spread is at most 2 in five of
+the six domains for both the paper and our reproduction. The exception in both is
+Block-Words. The paper reports a Block-Words spread of 2.23. Our reproduction reports 4.75.
+
+The fact that Block-Words is the common failure mode in both reproductions is consistent
+with the structure of the domain. Block-Words has twenty candidate goals per instance, and
+many of those goals share long stretches of their optimal plans (the same blocks need to be
+unstacked and restacked regardless of which word is being spelled). Observations from the
+first half of an optimal plan are therefore not enough to disambiguate among related word
+goals.
+
+We additionally report strict accuracy in Table~\ref{tab:accuracy-strict}, which the paper
+does not. Strict accuracy is a tougher measure than $Q$. A trial counts as correct only when
+the recogniser commits to a single goal that is exactly the true goal. Trials in which the
+true goal is tied with one or more other goals count as wrong, even though they count as
+right under $Q$. The two tables therefore measure two different things on the same data set.
+Table~\ref{tab:q-comparison} asks whether the true goal was \emph{not ruled out}, and
+Table~\ref{tab:accuracy-strict} asks whether the true goal was \emph{uniquely identified}.
+Under the stricter measure, accuracy at 50\% observation is at least 0.9 in Campus, Kitchen
+and Logistics. Intrusion-Detection comes in just below at 0.83. Block-Words at 0.35 and Grid
+at 0.71 fall well below.
+
+\begin{table}[!ht]
 \centering
-\caption{Spread $|G^*|$: ours vs.\ paper. $|G^*|$ is the average size of the tied top-probability
-set across trials; lower is better.}
+\caption{\textbf{Strict accuracy (unique-prediction correctness)} at $\beta = 1.0$, ours
+only. A trial counts as correct only if the recogniser's single most-likely prediction
+exactly equals the true goal. Tied top sets count as wrong. Always at most $Q$ from
+Table~\ref{tab:q-comparison} on the same data. The paper does not report this metric.}
+\label{tab:accuracy-strict}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+\multirow{2}{*}{Domain} & \multicolumn{5}{c}{Observation \%} \\
+\cmidrule(lr){2-6}
+ & 10 & 30 & 50 & 70 & 100 \\
+\midrule
+Block-Words           & 0.08 & 0.23 & 0.35 & 0.60 & 0.80 \\
+Campus                & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+Grid                  & 0.67 & 0.67 & 0.71 & 0.71 & 0.81 \\
+Intrusion-Detection   & 0.27 & 0.70 & 0.83 & 1.00 & 1.00 \\
+Kitchen               & 0.33 & 1.00 & 1.00 & 1.00 & 1.00 \\
+Logistics             & 0.58 & 0.89 & 0.89 & 0.89 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Claim~2 is supported in five of six domains by both the paper and our
+reproduction.} The shared failure mode is Block-Words. Our spread on Block-Words at 50\%
+observation is roughly twice the paper's. We attribute this to two implementation choices
+the paper does not specify: the value of the Boltzmann temperature $\beta$ and the
+observation-sampling strategy. Both are discussed in Section~\ref{sec:methodology} and
+revisited in the Discussion.
+
+\FloatBarrier
+\subsubsection{Claim 3: $|G^*|$ converges to one at 100\% observation}
+
+Table~\ref{tab:s-comparison} reports spread at every cell. At 100\% observation, our spread
+is 1.00 for Campus, Intrusion-Detection, Kitchen, and Logistics. It is 1.40 for Block-Words
+and 1.52 for Grid. The paper reports 1.00 for Campus, Easy IPC Grid, Intrusion-Detection, and
+Logistics, 1.13 for Block-Words and 1.47 for Kitchen.
+
+\textbf{Claim~3 is supported in four of the six domains in both the paper and our
+reproduction.} Block-Words fails to converge in both, suggesting that some block
+configurations admit multiple equal-cost spelling solutions even with the full plan observed.
+Kitchen fails to converge in the paper but does in our reproduction. Grid fails in our
+reproduction but does in the paper. Our Grid result reflects a different instance set, not a
+different method.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Spread $|G^*|$ (denoted $S$ in the original paper)}: ours vs.\ paper.
+$|G^*|$ is the average size of the tied top-probability set across trials. Lower is better.
+A value of 1.00 means every trial picked a single, unique winner.}
 \label{tab:s-comparison}
 \small
 \begin{tabular}{lrrrrr}
@@ -206,125 +441,132 @@ Logistics             &  2.17 & 1.28 & 1.28 & 1.22 & 1.00 \\
 \end{tabular}
 \end{table}
 
-\textbf{Headline finding.} We reproduce the paper's $Q = 1.00$ in every directly-comparable
-cell, and exceed it at Campus and Kitchen at $10\%$ observation. The spread metric tells a
-more nuanced story: at low observation percentages our $|G^*|$ is larger than the paper's by
-a factor of roughly 1.5--2$\times$ on Block-Words and Intrusion-Detection. By $100\%$
-observation, all directly-comparable domains converge to $|G^*| \leq 1.5$, matching the paper's
-behaviour. The Grid row is not directly comparable: our hand-expanded instance set has
-$|\mathcal{G}| = 2.6$ (vs.\ the paper's $7.5$), which trivially makes the recognition task easier;
-we report the cell values for completeness but draw no claim from them.
-
+\FloatBarrier
 \subsection{Results beyond original paper}
 
-The original paper does not specify the constant $\beta$ used in the Boltzmann likelihood
-(Eq.~2--3 of Ram\'irez \& Geffner, 2010). We performed a sensitivity sweep across
-$\beta \in \{0.1, 0.5, 1.0, 2.0, 5.0, 10.0\}$ and measured the resulting posterior probability
-mass $P(G^* \mid O)$ on the true goal. We find that for integer-valued action costs (which
-holds for all six benchmark domains), \emph{the rank-based metrics $Q$ and $|G^*|$ are
-mathematically invariant under $\beta$}: the Boltzmann transform is monotonic, so $\beta$ only
-changes the sharpness of the posterior, not the ordering of candidates. Thus the paper's
-unspecified $\beta$ does not affect its reported $Q$ or $|G^*|$ tables. It does, however,
-materially affect the posterior probability mass $P(G^* \mid O)$, which is the quantity that a
-downstream consumer of the recogniser (e.g.\ an assistant deciding whether to act) would
-actually rely upon. Figure~\ref{fig:beta} TODO shows the $\beta$-sensitivity of $P(G^* \mid O)$.
+The original paper writes the likelihood as $P(O \mid G) \propto \exp(-\beta \cdot \Delta(G, O))$ without specifying a value for the temperature $\beta$. We swept $\beta \in \{0.1, 0.5, 1.0, 2.0, 5.0, 10.0\}$ and measured the resulting posterior probability mass $P(G^* \mid O)$ on the true goal. The headline observation is that all of our domains have integer action costs, which means the cost differences $\Delta$ are integer-valued. The Boltzmann transform is monotonic in $-\beta \cdot \Delta$, so the rank of each candidate is preserved across any positive $\beta$. This makes the rank-based metrics $Q$ and $|G^*|$ mathematically invariant under $\beta$. Their values in the comparison tables above would be unchanged at any positive $\beta$.
 
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=0.85\textwidth]{figures/beta_sweep.png}
-    \caption{Posterior probability mass on the true goal, $P(G^* \mid O)$, as a function of
-    $\beta$, per (domain, observation \%). Lines slope upward as $\beta$ grows, while the
-    headline metrics $Q$ and $|G^*|$ remain flat. TODO: generate figure.}
-    \label{fig:beta}
-\end{figure}
+\subsubsection{Claim 4: $\beta$ affects $P(G^* \mid O)$ but not $Q$ or $|G^*|$}
 
-Table~\ref{tab:beta-ptrue} reports $P(G^* \mid O)$ across the swept $\beta$ values for every
-(domain, observation \%) cell. Two patterns emerge:
+What does change with $\beta$ is the actual probability mass on the true goal,
+$P(G^* \mid O)$. Table~\ref{tab:beta-ptrue} shows the values across the sweep. A low $\beta$
+produces a nearly uniform posterior, where the true goal receives close to $1/|\mathcal{G}|$
+of the mass. A high $\beta$ produces a sharp posterior. Mass concentrates on the goals with
+the lowest cost difference, capped at $1/|G^*|$ since $\beta$ cannot break ties between
+candidates with identical $\Delta$.
 
-\begin{itemize}
-    \item At low $\beta$, the posterior is nearly uniform across the candidate set, so
-          $P(G^* \mid O) \approx 1/|\mathcal{G}|$ regardless of how many observations the
-          recogniser has seen.
-    \item As $\beta$ grows, $P(G^* \mid O)$ rises toward $1/|G^*|$ --- the recogniser becomes
-          confident among the tied top set, but cannot break ties between candidates with
-          identical cost differences.
-\end{itemize}
+\textbf{Claim~4 is supported by the data.} The $Q$ and $|G^*|$ values in our $\beta$ sweep
+remain identical across the six $\beta$ settings, while $P(G^* \mid O)$ varies across the
+sweep, in some cells by an order of magnitude.
 
-\noindent The implication is that $\beta$ controls the \emph{actionable confidence} of the
-posterior, not its ranking. A practitioner choosing $\beta$ trades flatness against
-overconfidence; the paper's silence on this choice is therefore a real reproducibility gap for
-any downstream use of $P(G \mid O)$, even though the headline $Q$ and $|G^*|$ numbers are
-unaffected.
-
-% Regenerate with: python3 tools/beta_table.py
-% Replace the placeholder values below with the output of that script.
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
-\caption{Posterior probability mass on the true goal, $P(G^* \mid O)$, as a function of
-$\beta$. $Q$ and $|G^*|$ are $\beta$-invariant for integer-cost domains, but $P(G^* \mid O)$
-is not. TODO: replace placeholder values with output of \texttt{tools/beta\_table.py}.}
+\caption{Posterior probability mass on the true goal, $P(G^* \mid O)$, as a function of $\beta$. Computed by averaging the posterior probability assigned to the true goal across all trials in each (domain, observation \%) cell. $\beta$ affects this metric even though $Q$ and $|G^*|$ are $\beta$-invariant for integer-cost domains.}
 \label{tab:beta-ptrue}
 \small
 \begin{tabular}{llrrrrrr}
 \toprule
 Domain & Obs \% & $\beta{=}0.1$ & $\beta{=}0.5$ & $\beta{=}1.0$ & $\beta{=}2.0$ & $\beta{=}5.0$ & $\beta{=}10.0$ \\
 \midrule
-\multirow{5}{*}{Block-Words}        & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+block-words & 10 & 0.05 & 0.06 & 0.07 & 0.08 & 0.08 & 0.08 \\
+ & 30 & 0.06 & 0.10 & 0.14 & 0.20 & 0.22 & 0.22 \\
+ & 50 & 0.07 & 0.14 & 0.22 & 0.29 & 0.31 & 0.31 \\
+ & 70 & 0.08 & 0.27 & 0.44 & 0.56 & 0.61 & 0.61 \\
+ & 100 & 0.10 & 0.52 & 0.78 & 0.85 & 0.85 & 0.85 \\
 \midrule
-\multirow{5}{*}{Campus}             & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+campus & 10 & 0.54 & 0.67 & 0.79 & 0.91 & 0.98 & 0.98 \\
+ & 30 & 0.56 & 0.78 & 0.91 & 0.99 & 1.00 & 1.00 \\
+ & 50 & 0.61 & 0.90 & 0.98 & 1.00 & 1.00 & 1.00 \\
+ & 70 & 0.65 & 0.96 & 1.00 & 1.00 & 1.00 & 1.00 \\
+ & 100 & 0.70 & 0.98 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \midrule
-\multirow{5}{*}{Grid}               & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+grid & 10 & 0.39 & 0.44 & 0.48 & 0.54 & 0.59 & 0.59 \\
+ & 30 & 0.41 & 0.50 & 0.56 & 0.59 & 0.60 & 0.60 \\
+ & 50 & 0.43 & 0.56 & 0.61 & 0.65 & 0.66 & 0.66 \\
+ & 70 & 0.46 & 0.64 & 0.68 & 0.69 & 0.69 & 0.69 \\
+ & 100 & 0.51 & 0.72 & 0.77 & 0.78 & 0.79 & 0.79 \\
 \midrule
-\multirow{5}{*}{Intrusion Detection}& 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+intrusion-detection & 10 & 0.07 & 0.12 & 0.17 & 0.24 & 0.29 & 0.30 \\
+ & 30 & 0.10 & 0.27 & 0.48 & 0.64 & 0.70 & 0.71 \\
+ & 50 & 0.12 & 0.48 & 0.76 & 0.86 & 0.87 & 0.87 \\
+ & 70 & 0.15 & 0.69 & 0.90 & 0.97 & 1.00 & 1.00 \\
+ & 100 & 0.20 & 0.91 & 0.99 & 1.00 & 1.00 & 1.00 \\
 \midrule
-\multirow{5}{*}{Kitchen}            & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+kitchen & 10 & 0.34 & 0.39 & 0.44 & 0.53 & 0.61 & 0.61 \\
+ & 30 & 0.38 & 0.56 & 0.66 & 0.75 & 0.83 & 0.83 \\
+ & 50 & 0.43 & 0.69 & 0.82 & 0.94 & 1.00 & 1.00 \\
+ & 70 & 0.48 & 0.75 & 0.88 & 0.96 & 1.00 & 1.00 \\
+ & 100 & 0.53 & 0.83 & 0.95 & 0.99 & 1.00 & 1.00 \\
 \midrule
-\multirow{5}{*}{Logistics}          & 10  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 30  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 50  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 70  & TODO & TODO & TODO & TODO & TODO & TODO \\
-                                    & 100 & TODO & TODO & TODO & TODO & TODO & TODO \\
+logistics & 10 & 0.15 & 0.22 & 0.31 & 0.46 & 0.60 & 0.61 \\
+ & 30 & 0.19 & 0.44 & 0.67 & 0.82 & 0.86 & 0.86 \\
+ & 50 & 0.21 & 0.57 & 0.80 & 0.86 & 0.86 & 0.86 \\
+ & 70 & 0.26 & 0.75 & 0.87 & 0.89 & 0.89 & 0.89 \\
+ & 100 & 0.34 & 0.93 & 0.99 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\FloatBarrier
 \section{Discussion}
 
-Give your judgement on if your experimental results support the claims of the paper. Discuss the strengths and weaknesses of your approach - perhaps you didn't have time to run all the experiments, or perhaps you did additional experiments that further strengthened the claims in the paper.
+Our results support the core claim of the original paper. The method finds the true goal in
+every domain at every observation percentage we tested, in the sense that the true goal is
+always in the set of most likely candidates under the posterior. The shape of the recognition
+quality curve matches the paper. The decision to use Fast Downward with the landmark-cut
+heuristic reproduces the paper's reliance on an optimal admissible heuristic.
+
+The main quantitative gap is in the spread metric at low observation percentages. Our
+$|G^*|$ at 10\% observation is roughly twice the paper's on Block-Words and
+Intrusion-Detection. Two factors may explain this. We sample observations as a prefix of the
+optimal plan, while the paper does not state its sampling method. A prefix gives less
+information about the agent's goal than a uniform sample drawn across the whole plan,
+especially at the start. The paper may also use a higher $\beta$ in places, which would
+reduce spread by breaking near-ties. Without more detail in the original paper we cannot pin
+down which factor is dominant.
+
+The Grid result is bounded by the size of the upstream benchmark. Only two grid instances
+ship with the authors' archive, and they share a small candidate goal set. We hand-expanded
+the set with six additional instances built on the same two layouts, which gave us
+$|\mathcal{G}|$ of about 2.6 against the paper's 7.5. This makes our Grid task strictly
+easier than the paper's, so our cell values are not directly comparable. A clean comparison
+would require generating new grid layouts with larger candidate sets, which is outside the
+scope of this reproduction.
+
+The $\beta$ extension turned out to be a clean negative result that strengthens the paper's
+main claim. For integer-cost domains, no value of $\beta$ affects the ranking of candidates.
+The paper's headline $Q$ and $|G^*|$ tables are therefore unaffected by the unspecified
+$\beta$. The posterior probability mass on the true goal is not, and the paper's silence on
+$\beta$ matters for any downstream application that relies on those probabilities directly.
 
 \subsection{What was easy}
-Give your judgement of what was easy to reproduce. Perhaps the author's code is clearly written and easy to run, so it was easy to verify the majority of original claims. Or, the explanation in the paper was really easy to follow and put into code. 
 
-Be careful not to give sweeping generalizations. Something that is easy for you might be difficult to others. Put what was easy in context and explain why it was easy (e.g. code had extensive API documentation and a lot of examples that matched experiments in papers). 
+Definition~2 and Proposition~3 of the paper are short and clear. The compilation took about
+a hundred lines of Python and worked first try once the parameter substitution edge case
+was handled. Fast Downward solved every compiled instance in sub-second time on the smaller
+domains. The Bayesian scoring layer is twenty lines of code. The optimal plans that ship
+with Grid and Intrusion-Detection let us start the recognition loop without first running
+the planner over every instance in those domains.
 
 \subsection{What was difficult}
-List part of the reproduction study that took more time than you anticipated or you felt were difficult. 
 
-Be careful to put your discussion in context. For example, don't say "the maths was difficult to follow", say "the math requires advanced knowledge of calculus to follow". 
+The paper does not specify $\beta$. We spent some time chasing what we believed was a bug in
+the scoring code before realising that $\beta$ has no effect on the rank-based metrics we
+were measuring. We wrote the $\beta$ sweep as an extension once this was clear.
 
+Two of the shipped PDDL files have syntax errors that Fast Downward rejects. The Block-Words
+domain was missing a space between a hyphen and a type name. The Kitchen domain had
+duplicate constants. Both are purely syntactical fixes, but they block the pipeline until found.
 
-\section*{References}
+Campus and Kitchen ship as Python~2 generator scripts. Porting them to Python~3 and wrapping
+them in a driver that produces the same layout as the other domains took longer than
+expected, partly because the generators rely on a tar pipeline that expects \texttt{bzip2}
+on the host.
 
-Here include any references that you make use of throughout the report. Be sure to use LaTeX's built-in bibliography management system (see, e.g. \url{https://www.overleaf.com/learn/latex/Bibliography_management_with_bibtex}) 
+Four of the six domains do not ship with optimal solutions. We had to run Fast Downward over
+every problem in those domains as a one-time precomputation step before recognition could
+begin.
+
+\bibliography{references}
 
 \end{document}
